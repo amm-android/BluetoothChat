@@ -8,9 +8,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -36,6 +38,7 @@ import com.vise.bluetoothchat.mode.FriendInfo;
 import com.vise.common_base.utils.ToastUtil;
 import com.vise.common_utils.log.LogUtils;
 import com.vise.common_utils.utils.character.DateTime;
+import com.vise.common_utils.utils.view.ActivityUtil;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -118,11 +121,14 @@ public class ChatActivity extends BaseChatActivity implements EmojiconsFragment.
         @Override
         public void setDeviceName(String name) {
             LogUtils.i("setDeviceName:"+name);
+            if(mFriendInfo == null){//被动连接
+                mTitleTv.setText(name+"("+getString(R.string.device_online)+")");
+            }
         }
 
         @Override
         public void showMessage(String message, int code) {
-            if (!isFinishing()) {
+            if (isFinishing()) {
                 return;
             }
             LogUtils.i("showMessage:"+message);
@@ -151,33 +157,41 @@ public class ChatActivity extends BaseChatActivity implements EmojiconsFragment.
         mMsgSendIb = (ImageButton) findViewById(R.id.chat_msg_send);
         mEmojiconFl = (FrameLayout) findViewById(R.id.chat_emojicons);
         mProgressDialog = new ProgressDialog(mContext);
+
+        Button fab = (Button) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityUtil.startForwardActivity(ChatActivity.this, MainActivity.class,true);
+            }
+        });
     }
 
     @Override
     protected void initData() {
-        mFriendInfo = this.getIntent().getParcelableExtra(AppConstant.FRIEND_INFO);
-        if (mFriendInfo == null) {
-            return;
-        }
-        if(mFriendInfo.isOnline()){
-            mTitleTv.setText(mFriendInfo.getFriendNickName()+"("+getString(R.string.device_online)+")");
-        } else{
-            mTitleTv.setText(mFriendInfo.getFriendNickName()+"("+getString(R.string.device_offline)+")");
-        }
         mChatAdapter = new ChatAdapter(mContext);
         mChatMsgLv.setAdapter(mChatAdapter);
-
         mBluetoothChatHelper = new BluetoothChatHelper(chatCallback);
-        mProgressDialog.setMessage(getString(R.string.connect_friend_loading));
-        if(!isFinishing() && !mProgressDialog.isShowing()){
-            mProgressDialog.show();
-        }
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mBluetoothChatHelper.connect(mFriendInfo.getBluetoothDevice(), false);
+        //主动连接
+        mFriendInfo = this.getIntent().getParcelableExtra(AppConstant.FRIEND_INFO);
+        if (mFriendInfo != null) {
+            if(mFriendInfo.isOnline()){
+                mTitleTv.setText(mFriendInfo.getFriendNickName()+"("+getString(R.string.device_online)+")");
+            } else{
+                mTitleTv.setText(mFriendInfo.getFriendNickName()+"("+getString(R.string.device_offline)+")");
             }
-        }, 3000);
+            mProgressDialog.setMessage(getString(R.string.connect_friend_loading));
+            if(!isFinishing() && !mProgressDialog.isShowing()){
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
+            }
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mBluetoothChatHelper.connect(mFriendInfo.getBluetoothDevice(), false);
+                }
+            }, 3000);
+        }
     }
 
     @Override
@@ -243,7 +257,7 @@ public class ChatActivity extends BaseChatActivity implements EmojiconsFragment.
             // started already
             if (mBluetoothChatHelper.getState() == State.STATE_NONE) {
                 // Start the Bluetooth chat services
-                mBluetoothChatHelper.start(false);
+                mBluetoothChatHelper.start(false);//启动蓝牙服务
             }
         }
     }

@@ -123,11 +123,12 @@ public class GroupFriendAdapter extends BaseExpandableListAdapter {
         FriendInfo friendInfo = groupInfoList.get(groupPosition).getFriendList().get(childPosition);
         friendViewHolder.nameTv.setText(friendInfo.getFriendNickName()+"("+friendInfo.getIdentificationName()+")");
         friendViewHolder.addressTv.setText(friendInfo.getDeviceAddress());
-        if(friendInfo.isOnline()){
+        /*if(friendInfo.isOnline()){
             friendViewHolder.statusTv.setText(context.getString(R.string.device_online));
         } else{
             friendViewHolder.statusTv.setText(context.getString(R.string.device_offline));
-        }
+        }*/
+        friendViewHolder.statusTv.setText("已配对");
         return convertView;
     }
 

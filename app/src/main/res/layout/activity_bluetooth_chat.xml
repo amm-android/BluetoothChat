@@ -33,8 +33,9 @@
         android:transcriptMode="alwaysScroll"
         android:overScrollMode="never"
         android:scrollbars="none"
-        android:background="@mipmap/theme_bg_pink"
+
         />
+    <!--android:background="@mipmap/theme_bg_pink"-->
 
     <LinearLayout
         android:id="@+id/chat_msg_lin"
@@ -79,4 +80,13 @@
             android:visibility="gone"
             />
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="选择对方"/>
 </RelativeLayout>
