@@ -1,6 +1,7 @@
 package com.vise.bluetoothchat.activity;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -252,7 +253,7 @@ public class ChatActivity extends BaseChatActivity implements EmojiconsFragment.
     @Override
     protected void onResume() {
         super.onResume();
-        if (mBluetoothChatHelper != null) {
+        if (mBluetoothChatHelper != null && BluetoothAdapter.getDefaultAdapter().isEnabled()) {
             // Only if the state is STATE_NONE, do we know that we haven't
             // started already
             if (mBluetoothChatHelper.getState() == State.STATE_NONE) {
