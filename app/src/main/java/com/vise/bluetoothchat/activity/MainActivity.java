@@ -1,11 +1,14 @@
 package com.vise.bluetoothchat.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -54,6 +57,7 @@ public class MainActivity extends BaseChatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestPermission();
         setContentView(R.layout.activity_main);
     }
 
@@ -248,6 +252,32 @@ public class MainActivity extends BaseChatActivity
             groupInfo.setOnlineNumber(0);
             mGroupFriendListData.add(groupInfo);
             mGroupFriendAdapter.setGroupInfoList(mGroupFriendListData);
+        }
+    }
+
+    /**
+     * Android6.0之后需要动态申请权限
+     */
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            ArrayList<String> permissionsList = new ArrayList<>();
+
+            String[] permissions = {
+                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_ADMIN,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+            };
+
+            for (String perm : permissions) {
+                if (PackageManager.PERMISSION_GRANTED != checkSelfPermission(perm)) {
+                    permissionsList.add(perm);
+                    // 进入到这里代表没有权限.
+                }
+            }
+            if (!permissionsList.isEmpty()) {
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), 0);
+            }
         }
     }
 
