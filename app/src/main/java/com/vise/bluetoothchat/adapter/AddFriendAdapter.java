@@ -31,12 +31,13 @@ public class AddFriendAdapter extends HelperAdapter<BluetoothDevice> {
         TextView addressTv = viewHolder.getView(R.id.item_friend_address);
         TextView statusTv = viewHolder.getView(R.id.item_friend_status);
         iconIv.setVisibility(View.GONE);
-        statusTv.setVisibility(View.GONE);
+//        statusTv.setVisibility(View.GONE);
         if(!StringUtil.isNullOrEmpty(bluetoothDevice.getName())){
             nameTv.setText(bluetoothDevice.getName());
         } else{
             nameTv.setText(mContext.getString(R.string.device_unknown));
         }
         addressTv.setText(bluetoothDevice.getAddress());
+        statusTv.setText(bluetoothDevice.getBondState()==BluetoothDevice.BOND_BONDED?"已配对":"");
     }
 }
